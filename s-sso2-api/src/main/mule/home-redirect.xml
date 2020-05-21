@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<!-- This flow simulates accepting the post from the login page and processing it to set the OpenIDToken, before redirecting to 
+	the /appHome page. -->
+	<flow name="home-main" doc:id="f0764cd8-d93e-4d16-8b3b-be1fd2d4ac2c" >
+		<http:listener doc:name="Home Post Listener" doc:id="1e47ace6-4d55-47cb-92c4-c3fa775a542d" config-ref="HTTP_Listener_config" path="/appHomeDashboard">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers><![CDATA[#[output application/java
+				---
+				{
+					Location : vars.RedirectURI
+				}]]]></http:headers>
+            </http:error-response>
+		</http:listener>
+		<flow-ref doc:name="check-for-userId-password" doc:id="4bef02c7-9804-4ac3-bdbc-a882c872909e" name="check-for-userId-password"/>
+		<error-handler ref="global-error-handler" />
+	</flow>
+	<sub-flow name="check-for-userId-password" doc:id="d9340a56-3799-41d5-b992-b1503a0862be" >
+		<choice doc:name="Choice" doc:id="53adce31-c9ed-4055-a684-52f7aeba41fc" >
+			<when expression="#[(attributes.headers.userId == null) or (attributes.headers.password == null)]">
+				<raise-error doc:name="Raise error" doc:id="555679e7-b964-4a0a-9c45-7be9aa737cdd" type="PASSWORD:INVALID"/>
+			</when>
+			<otherwise >
+				<parse-template doc:name="Show Home Page" doc:id="f100ed7b-2a4e-44e9-8f4e-c5083982cfd7" location="${templateLocation.homePage}" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	
+	
+</mule>

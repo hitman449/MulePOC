@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<flow name="login-main" doc:id="546c8710-fa96-4132-bf58-993b63a3aff4" >
+		<http:listener doc:name="Login Listener" doc:id="81ec7ac8-d1c2-489d-8f6e-5145c154cd5b" config-ref="HTTP_Listener_config" path="/showLogin">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers><![CDATA[#[output application/java
+				---
+				{
+					Location : vars.RedirectURI
+				}]]]></http:headers>
+            </http:error-response>
+		</http:listener>
+		<parse-template doc:name="Login Page" doc:id="012f441c-aa7c-4e89-8493-9dad5eced74a" location="${templateLocation.loginPage}" />
+	
+</flow>
+	
+</mule>

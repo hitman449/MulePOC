@@ -1,0 +1,13 @@
+main-api:
+  host: "127.0.0.1"
+  port: "8081"
+
+
+templateLocation:
+  loginPage: "htmlTemplate//ssoLoginresponseHtml.html"
+  homePage: "htmlTemplate//responseHtml.html"
+
+  
+redirectHomeURI: "http://localhost:8081/SSO/appHomeDashboard"
+redirectLoginURI: "http://localhost:8081/SSO/showLogin"
+redirectAppURI: "http://127.0.0.1:8081/SSO/appHome"

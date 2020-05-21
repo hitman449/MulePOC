@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The purpose of this application is to prove the concept of using a 302 redirect to capture login 
+for any attempt to access an application URL.  If you try you get redirected to the login page where
+the openidtoken is set and then returns you to the first endpoint.  No backend processing to be done at the
+point and later we will implement an OpenID/OAuth provider if the project gets approved based on this POC -->
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<!-- This first flow simulates the Application Home Facade that tests for the existance of the OpenIDToken,
+	if found returns a simulated response from the application, if not found will redirect to the login page
+	to get the user to enter email and password which will set the OpenIDToken header and redirect back to this
+	URL where the simulated application home page will be displayed. 
+	This is working now such that if I add the openidtoken in postman the simulated home page is displayed, and
+	if I don't add that header then the login page is displayed.  See below for the other side of the
+	conversation. -->
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="4e699ebc-6eee-4207-a9fd-bf16d232b72d" />
+	<flow name="api-main" doc:id="10e07c94-1c2b-431f-9c10-5e76d4d92668" >
+		<http:listener doc:name="Home Facade Listener" doc:id="53bfa6c0-8ba3-42bb-bc74-6518f11bee57" config-ref="HTTP_Listener_config" path="/appHome">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[output application/java
+				---
+				{
+					Location : vars.RedirectURI
+				}]]]></http:headers>
+            </http:error-response>
+		</http:listener>
+		<!-- Adding transaction Id Just for logging purpose -->
+		<set-variable value="#[if (message.attributes.headers.transaction_id != null) message.attributes.headers.transaction_id else (correlationId replace '-' with '')]" doc:name="Set TransactionID" doc:id="2cc7cad3-439a-4c74-a671-751006fb0b7b" variableName="TransactionID"/>
+		<logger level="INFO" doc:name="Log Flow Start" doc:id="f2852641-fd9a-4bca-ba80-9aaf12f1d738" message="TransactionID:- #[vars.TransactionID] Flow Started #[flow.name]" />
+		<flow-ref doc:name="validate-openidtoken" doc:id="b0112410-bcb9-41f7-8811-46346b27d95a" name="validate-openidtoken"/>
+		<error-handler ref="global-error-handler" />
+	</flow>
+	<sub-flow name="validate-openidtoken" doc:id="7cff9509-2328-4a30-bd84-7ca4fcabb191" >
+		<choice doc:name="Choice" doc:id="9ac8f89b-976d-4372-8e66-807fc86bf76a" >
+			<when expression="attributes.headers.openidtoken != null">
+				<parse-template doc:name="Show Home Page" doc:id="4e9d9965-f4d1-45bb-a66d-771b44413b8f" location="${templateLocation.homePage}"/>			
+			</when>
+			<otherwise >
+				<validation:is-not-null doc:name="validate openidtoken not null" doc:id="adccce40-d171-4079-9764-b87a157ff256" config-ref="Validation_Config" value="#[attributes.headers.openidtoken]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+		<!-- this flow simply displays the Login page. -->
+	
+</mule>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	<error-handler name="global-error-handler" doc:id="7f95de5a-09dc-49a8-a5a8-1c11065c5a18" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8254e21c-b4af-48d3-bc53-01ba7c2f1218" type="VALIDATION:NULL">
+			<logger level="INFO" doc:name="Logger" doc:id="0d0c5a19-f2ee-4aa0-905f-1bc9cad14c98" message="TransactionID:- #[vars.TransactionID] Flow Started #[flow.name]" />
+			<set-variable value="${redirectLoginURI}" doc:name="Set Login Redirect" doc:id="dd360d1a-a69a-408f-93b7-9ca89b62104f" variableName="RedirectURI" />
+			<set-variable value="302" doc:name="Set Variable" doc:id="a30f3873-3bb3-481a-bc1b-c9cb7f595f4a" variableName="httpStatus" />
+			<logger level="INFO" doc:name="Logger" doc:id="66a4b27c-d150-43fb-82bc-419b94f527e3" message="TransactionID:- #[vars.TransactionID] Flow Ended #[flow.name]" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c1c54673-a653-445b-b0c0-d802dfc971dd" type="PASSWORD:INVALID">
+			<logger level="INFO" doc:name="Logger" doc:id="45e8c0b2-81ad-416b-a50e-88fa461f84da" message="TransactionID:- #[vars.TransactionID] Flow Started #[flow.name]" />
+			<set-variable value="'fdsfsdfsdfsdf'" doc:name="Set Header tokenID" doc:id="dc37d12e-e9a5-4207-8134-50daabd0f883" variableName="openidtoken" />
+			<set-variable value="${redirectAppURI}" doc:name="Set Login Redirect" doc:id="f38515b0-9074-4bc1-a982-4eb85656e1e6" variableName="RedirectURI" />
+			<set-variable value="302" doc:name="Set Variable" doc:id="7cc4475c-cff8-46b0-b405-da622e594f82" variableName="httpStatus" />
+			<logger level="INFO" doc:name="Logger" doc:id="dcdae3d5-8c33-407c-81c1-0465d6687593" message="TransactionID:- #[vars.TransactionID] Flow Ended #[flow.name]" />	
+		</on-error-propagate>
+	</error-handler>
+</mule>
+

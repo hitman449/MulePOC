@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<!-- HTTP Listner Config -->
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1a3fae81-26e8-412c-8fc3-1f8b2077cd9f" basePath="/SSO" >
+		<http:listener-connection host="${main-api.host}" port="${main-api.port}" />
+	</http:listener-config>
+	 <!-- Reading Properties File -->
+	<configuration-properties file="properties.yaml"/>
+	<!-- HTTP Requester Config -->
+</mule>
